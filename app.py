@@ -40,6 +40,8 @@ def load_csv(file):
         session.add_all(products)
         session.commit()
         print('Database initialized from inventory.csv')
+    else:
+        print('Database already initialized!')
 
 
 def clean_data(params):
