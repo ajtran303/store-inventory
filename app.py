@@ -5,7 +5,7 @@ import datetime as dt
 import csv
 
 
-engine = create_engine('sqlite:///inventory.db', echo=True)
+engine = create_engine('sqlite:///inventory.db', echo=False)
 Session = sessionmaker(bind=engine)
 session = Session()
 Base = declarative_base()
@@ -22,10 +22,10 @@ class Product(Base):
 
     def __repr__(self):
         attributes = '' + \
-            f'product_name={self.product_name}, ' + \
+            f'product_name="{self.product_name}", ' + \
             f'product_quantity={self.product_quantity}, ' + \
             f'product_price={self.product_price}, ' + \
-            f'date_updated={self.date_updated}'
+            f'date_updated="{self.date_updated}"'
         return f'<Product({attributes})>'
 
 
@@ -66,9 +66,68 @@ def clean_date(date_params):
     return dt.date(year=year,  month=month, day=day)
 
 
+def show_menu():
+    prompt = '' + \
+        '[V]iew a single product\'s inventory\n' + \
+        '[A]dd a new product to the database\n' + \
+        '[B]ackup the entire inventory\n' + \
+        '[Q]uit the program\n'
+    print(prompt)
+
+
+def handle_user_input(option):
+    menu_option = {
+        'Q': quit_program,
+        'V': view_product,
+        'A': add_product,
+        'B': backup_inventory
+        }
+    try:
+        menu_option[option.upper()]()
+    except KeyError:
+        handle_invalid_input()
+
+
+def handle_invalid_input():
+    print('Invalid menu option\n')
+    show_menu()
+
+
+def quit_program():
+    print('Goodbye!')
+    quit()
+
+
+def view_product():
+    upper_limit = session.query(Product).count()
+    product_id = input(f'Select a [Product ID] between 1 and {upper_limit}: ')
+    if int(product_id) not in set(range(1,(upper_limit+1))):
+        handle_invalid_input()
+    else:
+        product = session.query(Product).filter_by(product_id=int(product_id)).one()
+        print(f'\n{product}\n')
+        show_menu()
+
+
+
+def add_product():
+    pass
+
+
+def backup_inventory():
+    pass
+
+
 
 
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
 
     load_csv('inventory.csv')
+
+    print('Welcome to the Product Inventory Database!\n')
+    show_menu()
+
+    while True:
+        menu_option = input('Select an [OPTION]: ')
+        handle_user_input(menu_option)
