@@ -46,7 +46,7 @@ def load_csv(file):
 
 def clean_data(params):
     params['product_name'] = clean_name(params['product_name'])
-    params['product_price'] = int(float(params['product_price'][1:])*100)
+    params['product_price'] = clean_price(params['product_price'])
     params['product_quantity'] = int(params['product_quantity'])
     params['date_updated'] = clean_date(params['date_updated'])
     return params
@@ -61,13 +61,17 @@ def clean_name(name_params):
     return name_params
 
 
+def clean_price(price_params):
+    return int(float(price_params[1:])*100)
+
+
 def clean_date(date_params):
     month, day, year = map(lambda x: int(x), date_params.split('/'))
     return dt.date(year=year,  month=month, day=day)
 
 
 def show_menu():
-    prompt = '' + \
+    prompt = '\n' + \
         '[V]iew a single product\'s inventory\n' + \
         '[A]dd a new product to the database\n' + \
         '[B]ackup the entire inventory\n' + \
@@ -109,10 +113,35 @@ def view_product():
         show_menu()
 
 
-
 def add_product():
-    pass
+    print('Adding product to database...')
+    name = input('Enter product name (eg. Apples - Red): ')
+    quantity = input('Enter product quantity (eg. 3): ')
+    price = input('Enter product price (eg. $0.99): ')
+    print(f'{name}, {quantity}, {price}\n')
+    confirmation = input('Is this correct? [Y]es or [N]o: ')
+    if confirmation.upper() not in {'Y', 'N'}:
+        handle_invalid_input()
+    elif confirmation.upper() == 'N':
+        show_menu()
+    elif confirmation.upper() == 'Y':
+        handle_add_product(name=name, quantity=quantity, price=price)
 
+
+def handle_add_product(name, quantity, price):
+    if '$' != price[0] and len(price) < 5:
+        print('Invalid price! Hint: use a dollar sign and decimal, like $0.99\n')
+        show_menu()
+    else:
+        price = clean_price(price)
+    try:
+        quantity = int(abs(quantity))
+    except TypeError:
+        print('Invalid quantity! Must be a number, like 3\n')
+        show_menu()
+    try:
+        product = Product(product_name=name, product_quantity=quantity,
+            product_price=price, date_updated=dt.datetime.now())
 
 def backup_inventory():
     pass
