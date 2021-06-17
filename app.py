@@ -22,11 +22,17 @@ class Product(Base):
 
     def __repr__(self):
         attributes = '' + \
+            f'product_id="{self.product_id}", ' + \
             f'product_name="{self.product_name}", ' + \
             f'product_quantity={self.product_quantity}, ' + \
             f'product_price={self.product_price}, ' + \
             f'date_updated="{self.date_updated}"'
         return f'<Product({attributes})>'
+
+    def save(self):
+        session.add(self)
+        session.commit()
+        return f'{self.__repr__} saved!'
 
 
 def load_csv(file):
@@ -130,18 +136,19 @@ def add_product():
 
 def handle_add_product(name, quantity, price):
     if '$' != price[0] and len(price) < 5:
-        print('Invalid price! Hint: use a dollar sign and decimal, like $0.99\n')
+        print('Invalid price! Hint: use a dollar sign & decimal, like $0.99\n')
         show_menu()
     else:
         price = clean_price(price)
     try:
-        quantity = int(abs(quantity))
+        quantity = int(quantity)
     except TypeError:
         print('Invalid quantity! Must be a number, like 3\n')
         show_menu()
-    try:
-        product = Product(product_name=name, product_quantity=quantity,
-            product_price=price, date_updated=dt.datetime.now())
+    
+    product = Product(product_name=name, product_quantity=quantity, product_price=price, date_updated=dt.datetime.now())
+    product.save()
+    show_menu()
 
 def backup_inventory():
     pass
