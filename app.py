@@ -151,8 +151,23 @@ def handle_add_product(name, quantity, price):
     show_menu()
 
 def backup_inventory():
-    pass
+    with open('backup.csv', 'a') as csvfile:
+        fieldnames = ['product_id', 'product_name', 'product_price', 
+                        'product_quantity', 'date_updated']
+        productwriter = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
+        productwriter.writeheader()
+        for product in session.query(Product).all():
+            productwriter.writerow({
+                'product_id': product.product_id, 
+                'product_name': product.product_name, 
+                'product_price': product.product_price, 
+                'product_quantity': product.product_quantity, 
+                'date_updated': product.date_updated
+            })
+
+    print('Database backed up to backup.csv')
+    show_menu()
 
 
 
