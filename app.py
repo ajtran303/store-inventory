@@ -94,7 +94,7 @@ def handle_user_input(option):
         'V': view_product,
         'A': add_product,
         'B': backup_inventory
-        }
+    }
     try:
         menu_option[option.upper()]()
     except KeyError:
@@ -143,40 +143,45 @@ def add_product():
 
 
 def handle_add_product(name, quantity, price):
-    if '$' != price[0] and len(price) < 5:
-        print('Invalid price! Hint: use a dollar sign & decimal, like $0.99\n')
-        show_menu()
-    else:
-        price = clean_price(price)
     try:
-        quantity = int(quantity)
+        price = clean_price(price)
     except TypeError:
-        print('Invalid quantity! Must be a number, like 3\n')
+        print('Invalid price! Must be a dollar amount, like 1.99 or 2\n')
         show_menu()
-    
-    product = Product(product_name=name, product_quantity=quantity, product_price=price, date_updated=dt.datetime.now())
+    try:
+        if quantity == int(quantity):
+            return int(quantity)
+        else:
+            print('Invalid quantity! Must be a whole number, like 3\n')
+            show_menu()
+    except TypeError:
+        print('Invalid quantity! Must be a whole number, like 3\n')
+        show_menu()
+
+    product = Product(product_name=name, product_quantity=quantity,
+                      product_price=price, date_updated=dt.datetime.now())
     product.save()
     show_menu()
 
+
 def backup_inventory():
-    with open('backup.csv', 'a') as csvfile:
-        fieldnames = ['product_id', 'product_name', 'product_price', 
-                        'product_quantity', 'date_updated']
+    with open('backup.csv', 'w') as csvfile:
+        fieldnames = ['product_id', 'product_name', 'product_price',
+                      'product_quantity', 'date_updated']
         productwriter = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         productwriter.writeheader()
         for product in session.query(Product).all():
             productwriter.writerow({
-                'product_id': product.product_id, 
-                'product_name': product.product_name, 
-                'product_price': product.product_price, 
-                'product_quantity': product.product_quantity, 
+                'product_id': product.product_id,
+                'product_name': product.product_name,
+                'product_price': product.product_price,
+                'product_quantity': product.product_quantity,
                 'date_updated': product.date_updated
             })
 
     print('Database backed up to backup.csv')
     show_menu()
-
 
 
 if __name__ == '__main__':
