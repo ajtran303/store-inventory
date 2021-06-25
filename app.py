@@ -114,11 +114,16 @@ def quit_program():
 def view_product():
     upper_limit = session.query(Product).count()
     product_id = input(f'Select a [Product ID] between 1 and {upper_limit}: ')
-    if int(product_id) not in set(range(1,(upper_limit+1))):
+    if int(product_id) not in set(range(1, (upper_limit+1))):
         handle_invalid_input()
     else:
-        product = session.query(Product).filter_by(product_id=int(product_id)).one()
-        print(f'\n{product}\n')
+        product = session.query(Product).filter_by(
+            product_id=int(product_id)).one()
+        product_output = '' + \
+                         f'__{product.product_name}__\n' + \
+                         f'Price: ${float(product.product_price)/100}\n' + \
+                         f'Quantity: {product.product_quantity}\n'
+        print(f'\n{product_output}')
         show_menu()
 
 
