@@ -68,7 +68,10 @@ def clean_name(name_params):
 
 
 def clean_price(price_params):
-    return int(float(price_params[1:])*100)
+    if price_params[0] == '$' and len(price) > 1:
+        return int(float(price_params[1:])*100)
+    else:
+        return int(float(price_params)*100)
 
 
 def clean_date(date_params):
@@ -123,7 +126,7 @@ def add_product():
     print('Adding product to database...')
     name = input('Enter product name (eg. Apples - Red): ')
     quantity = input('Enter product quantity (eg. 3): ')
-    price = input('Enter product price (eg. $0.99): ')
+    price = input('Enter product price in dollars (eg. 1.99 or 2): ')
     print(f'{name}, {quantity}, {price}\n')
     confirmation = input('Is this correct? [Y]es or [N]o: ')
     if confirmation.upper() not in {'Y', 'N'}:
