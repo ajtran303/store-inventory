@@ -120,9 +120,9 @@ def view_product():
         product = session.query(Product).filter_by(
             product_id=int(product_id)).one()
         product_output = '' + \
-                         f'__{product.product_name}__\n' + \
-                         f'Price: ${float(product.product_price)/100}\n' + \
-                         f'Quantity: {product.product_quantity}\n'
+            f'__{product.product_name}__\n' + \
+            f'Price: ${float(product.product_price)/100}\n' + \
+            f'Quantity: {product.product_quantity}\n'
         print(f'\n{product_output}')
         show_menu()
 
@@ -145,7 +145,8 @@ def add_product():
 def handle_add_product(name, quantity, price):
     if validate_numbers(quantity, price) is True:
         product = Product(product_name=name, product_quantity=quantity,
-                          product_price=clean_price(price), date_updated=dt.datetime.now())
+                          product_price=clean_price(price),
+                          date_updated=dt.datetime.now())
         product.save()
         print(f'{product.product_name} saved!')
     show_menu()
