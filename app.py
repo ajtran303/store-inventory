@@ -68,7 +68,7 @@ def clean_name(name_params):
 
 
 def clean_price(price_params):
-    if price_params[0] == '$' and len(price) > 1:
+    if price_params[0] == '$' and len(price_params) > 1:
         return int(float(price_params[1:])*100)
     else:
         return int(float(price_params)*100)
@@ -131,7 +131,7 @@ def add_product():
     print('Adding product to database...')
     name = input('Enter product name (eg. Apples - Red): ')
     quantity = input('Enter product quantity (eg. 3): ')
-    price = input('Enter product price in dollars (eg. 1.99 or 2): ')
+    price = input('Enter product price in dollars (eg. 1.99, 2, $3, $4.99): ')
     print(f'{name}, {quantity}, {price}\n')
     confirmation = input('Is this correct? [Y]es or [N]o: ')
     if confirmation.upper() not in {'Y', 'N'}:
@@ -143,25 +143,28 @@ def add_product():
 
 
 def handle_add_product(name, quantity, price):
+    if validate_numbers(quantity, price) is True:
+        product = Product(product_name=name, product_quantity=quantity,
+                          product_price=clean_price(price), date_updated=dt.datetime.now())
+        product.save()
+    show_menu()
+
+
+def validate_numbers(quantity, price):
     try:
         price = clean_price(price)
-    except TypeError:
-        print('Invalid price! Must be a dollar amount, like 1.99 or 2\n')
-        show_menu()
+    except ValueError:
+        print('Invalid price! Must be a dollar amount eg. 1.99, 2, $3, $4.99\n')
+        return False
     try:
-        if quantity == int(quantity):
-            return int(quantity)
-        else:
+        if float(quantity) != int(quantity):
             print('Invalid quantity! Must be a whole number, like 3\n')
-            show_menu()
-    except TypeError:
+            return False
+    except ValueError:
         print('Invalid quantity! Must be a whole number, like 3\n')
-        show_menu()
-
-    product = Product(product_name=name, product_quantity=quantity,
-                      product_price=price, date_updated=dt.datetime.now())
-    product.save()
-    show_menu()
+        return False
+    else:
+        return True
 
 
 def backup_inventory():
