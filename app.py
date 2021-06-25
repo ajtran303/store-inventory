@@ -147,6 +147,7 @@ def handle_add_product(name, quantity, price):
         product = Product(product_name=name, product_quantity=quantity,
                           product_price=clean_price(price), date_updated=dt.datetime.now())
         product.save()
+        print(f'{product.product_name} saved!')
     show_menu()
 
 
