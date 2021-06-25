@@ -114,8 +114,12 @@ def quit_program():
 def view_product():
     upper_limit = session.query(Product).count()
     product_id = input(f'Select a [Product ID] between 1 and {upper_limit}: ')
-    if int(product_id) not in set(range(1, (upper_limit+1))):
-        handle_invalid_input()
+    try:
+        if int(product_id) not in set(range(1, (upper_limit+1))):
+            handle_invalid_input()
+    except ValueError:
+        print(f'Invalid input! Select a number between 1 and {upper_limit}!')
+        show_menu()
     else:
         product = session.query(Product).filter_by(
             product_id=int(product_id)).one()
